@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WiiUUSBHelper_JSONUpdater.Eshop
 {
-    class TitleID : IEquatable<TitleID>
+    class TitleID : IEquatable<TitleID>, IComparable<TitleID>
     {
         private readonly string titleIDString;
 
@@ -176,5 +176,10 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
             return -1629438923 + EqualityComparer<string>.Default.GetHashCode(titleIDString);
         }
         #endregion
+
+        public int CompareTo(TitleID other)
+        {
+            return titleIDString.CompareTo(other.titleIDString);
+        }
     }
 }

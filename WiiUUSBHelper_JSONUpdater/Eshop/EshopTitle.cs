@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace WiiUUSBHelper_JSONUpdater.Eshop
 {
-    class EshopTitle : IEquatable<EshopTitle>
+    class EshopTitle : IEquatable<EshopTitle>, IComparable<EshopTitle>
     {
         #region Properties - JSON
         private string _version;
@@ -153,6 +153,12 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
             hashCode = hashCode * -1521134295 + EqualityComparer<TitleID>.Default.GetHashCode(TitleId);
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Version);
             return hashCode;
+        }
+
+        public int CompareTo(EshopTitle other)
+        {
+            var comp1 = TitleId.CompareTo(other.TitleId);
+            return comp1 != 0 ? comp1 : Version.CompareTo(other.Version);
         }
     }
 }

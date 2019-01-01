@@ -22,7 +22,10 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
 
         public static void WriteTitlesToJsonFile(ICollection<EshopTitle> titles, DatabaseJsonType jsonType)
         {
-            JArray json = new JArray(titles.Select(t => JObject.FromObject(t)).ToArray());
+            List<EshopTitle> titleList = titles.ToList();
+            titleList.Sort();
+
+            JArray json = new JArray(titleList.Select(t => JObject.FromObject(t)).ToArray());
             string filePath = jsonType.GetFilePath();
 
             DialogResult shouldCreateBackup = MessageBox.Show(String.Format("Do you want to create a backup of {0} ?", filePath), "Question", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
@@ -50,7 +53,7 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
             string jsonString = JsonArrayToString(json);
             File.WriteAllText(filePath, jsonString);
 
-            Console.WriteLine("Wrote {0,5} titles to database file {1}", titles.Count, filePath);
+            Console.WriteLine("Wrote {0,5} titles to database file {1}", titleList.Count, filePath);
         }
 
         private static string JsonArrayToString(JArray titles)
