@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
 using System.Runtime.Serialization;
 
 namespace WiiUUSBHelper_JSONUpdater.Eshop
@@ -36,6 +37,11 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
                 default:
                     return null;
             }
+        }
+
+        public static string GetName(this Region region)
+        {
+            return region == Region.None ? string.Empty : Enum.GetName(typeof(Region), region);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 
@@ -14,9 +15,29 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
         public string Name { get; set; }
         public int Platform { get; set; }
         public string ProductCode { get; set; }
+        [JsonIgnore]
         public Region Region { get; set; }
+        [JsonProperty(PropertyName = "Region")]
+        public string RegionString
+        {
+            get => Region.GetName();
+            set
+            {
+                if (Enum.TryParse(value, out Region region))
+                {
+                    Region = region;
+                }
+            }
+        }
         public string Size { get; set; } // string instead of ulong is used to conform to original json structure
+        [JsonIgnore]
         public TitleID TitleId { get; set; }
+        [JsonProperty(PropertyName = "TitleId")]
+        public string TitleIdString
+        {
+            get => TitleId.ToString();
+            set => TitleId = new TitleID(value);
+        }
         public bool PreLoad { get; set; } // always false? (except for 5 titles in injections.json)
         public string Version
         {
@@ -43,6 +64,7 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
         private bool didCacheJsonType = false;
         private DatabaseJsonType _jsonType;
 
+        [JsonIgnore]
         public DatabaseJsonType JsonType
         {
             get
@@ -63,6 +85,7 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
         }
         #endregion
 
+        [JsonIgnore]
         public bool IsNativeTitle
         {
             get
