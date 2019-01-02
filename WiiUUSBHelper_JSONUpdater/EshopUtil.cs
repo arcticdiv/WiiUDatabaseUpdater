@@ -381,7 +381,7 @@ namespace WiiUUSBHelper_JSONUpdater
                 {
                     try
                     {
-                        dlc.Size = (await GetContentSizeForTitle(dlc)).ToString();
+                        dlc.Size = await GetContentSizeForTitle(dlc);
                         // if no exception is thrown, the title does have a DLC
                         dlcList.Add(dlc);
                         break;
@@ -410,13 +410,13 @@ namespace WiiUUSBHelper_JSONUpdater
         public async Task AddSizesToTitles(ICollection<EshopTitle> titles)
         {
             // only get size for titles that do not already have a size
-            int calcsRequired = titles.Count(t => (String.IsNullOrEmpty(t.Size) || t.Size == "0"));
+            int calcsRequired = titles.Count(t => t.Size == 0);
             Console.WriteLine("Getting title sizes for {0} titles ...", calcsRequired);
             progressManager.SetTitle(string.Format("Getting title sizes for {0} titles ...", calcsRequired));
             progressManager.Reset(calcsRequired);
 
             int index = 1;
-            foreach (EshopTitle title in titles.Where(t => (String.IsNullOrEmpty(t.Size) || t.Size == "0")))
+            foreach (EshopTitle title in titles.Where(t => t.Size == 0))
             {
                 progressManager.Step(title.TitleId.ToString());
                 
@@ -425,7 +425,7 @@ namespace WiiUUSBHelper_JSONUpdater
                 {
                     try
                     {
-                        title.Size = (await GetContentSizeForTitle(title)).ToString();
+                        title.Size = await GetContentSizeForTitle(title);
                         break;
                     }
                     catch (Exception e)

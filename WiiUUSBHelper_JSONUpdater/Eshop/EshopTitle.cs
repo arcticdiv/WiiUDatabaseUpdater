@@ -29,7 +29,20 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
                 }
             }
         }
-        public string Size { get; set; } // string instead of ulong is used to conform to original json structure
+        [JsonIgnore]
+        public ulong Size { get; set; }
+        [JsonProperty(PropertyName = "Size")]
+        public string SizeString
+        {
+            get => Size.ToString();
+            set
+            {
+                if (ulong.TryParse(value, out ulong size))
+                {
+                    Size = size;
+                }
+            }
+        }
         [JsonIgnore]
         public TitleID TitleId { get; set; }
         [JsonProperty(PropertyName = "TitleId")]
@@ -55,7 +68,7 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
             get
             {
                 return (JsonType == DatabaseJsonType.Games || JsonType == DatabaseJsonType.Games3DS || JsonType == DatabaseJsonType.GamesWii)
-                        && (String.IsNullOrEmpty(Size) || Size == "0");
+                        && Size == 0;
             }
         }
         #endregion
@@ -118,7 +131,7 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
                         IconUrl = child.Value;
                         break;
                     case "platform":
-                        Platform = Int32.Parse(child.Attribute("id").Value);
+                        Platform = int.Parse(child.Attribute("id").Value);
                         break;
 
                     // ninja data
@@ -126,7 +139,7 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
                         TitleId = new TitleID(child.Value);
                         break;
                     case "content_size":
-                        Size = UInt64.Parse(child.Value).ToString();
+                        Size = ulong.Parse(child.Value);
                         break;
                     case "title_version":
                         Version = child.Value;
