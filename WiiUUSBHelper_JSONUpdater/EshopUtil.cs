@@ -277,7 +277,7 @@ namespace WiiUUSBHelper_JSONUpdater
                         {
                             EshopTitle update = new EshopTitle();
                             update.TitleId = new TitleID(updateElement.Element("id").Value);
-                            update.Version = updateElement.Element("version").Value;
+                            update.VersionString = updateElement.Element("version").Value;
                             update.JsonType = DatabaseJsonType.Updates;
 
                             updateSet.Add(update);
@@ -348,7 +348,7 @@ namespace WiiUUSBHelper_JSONUpdater
                 {
                     EshopTitle title = new EshopTitle();
                     title.TitleId = new TitleID(binaryReader.ReadUInt64().ToString("X16"));
-                    title.Version = binaryReader.ReadUInt32().ToString();
+                    title.VersionString = binaryReader.ReadUInt32().ToString();
 
                     if (title.JsonType != DatabaseJsonType.Games3DS && title.JsonType != DatabaseJsonType.None) // for some reason there are a few games in the versionlist, skip them
                         updateList.Add(title);
@@ -465,7 +465,7 @@ namespace WiiUUSBHelper_JSONUpdater
 
             bool isUpdate = title.TitleId.IsUpdate;
             string tmdPath = isUpdate
-                ? String.Format(TMDUpdatePath, title.TitleId, title.Version)
+                ? String.Format(TMDUpdatePath, title.TitleId, title.VersionString)
                 : String.Format(TMDGamePath, title.TitleId);
             byte[] tmd = await webClient.DownloadDataTaskAsync(TMDUrl + tmdPath);
 
@@ -473,7 +473,7 @@ namespace WiiUUSBHelper_JSONUpdater
             // sanity checks
             if (!(new TitleID(BitConverter.ToUInt64(tmd, 0x18c).SwapEndianness().ToString("X16")).Equals(title.TitleId)))
                 throw new InvalidDataException("TMD's titleID does not match");
-            if (isUpdate && BitConverter.ToUInt16(tmd, 0x1dc).SwapEndianness().ToString() != title.Version)
+            if (isUpdate && BitConverter.ToUInt16(tmd, 0x1dc).SwapEndianness().ToString() != title.VersionString)
                 throw new InvalidDataException("TMD's version does not match");
 
             int contentCount = BitConverter.ToUInt16(tmd, 0x1de).SwapEndianness();

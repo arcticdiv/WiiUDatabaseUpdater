@@ -8,13 +8,14 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
     class EshopTitle : IEquatable<EshopTitle>, IComparable<EshopTitle>
     {
         #region Properties - JSON
-        private string _version;
+        private int _version = -1;
 
         public string EshopId { get; set; }
         public string IconUrl { get; set; }
         public string Name { get; set; }
         public int Platform { get; set; }
         public string ProductCode { get; set; }
+
         [JsonIgnore]
         public Region Region { get; set; }
         [JsonProperty(PropertyName = "Region")]
@@ -29,6 +30,7 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
                 }
             }
         }
+
         [JsonIgnore]
         public ulong Size { get; set; }
         [JsonProperty(PropertyName = "Size")]
@@ -43,6 +45,7 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
                 }
             }
         }
+
         [JsonIgnore]
         public TitleID TitleId { get; set; }
         [JsonProperty(PropertyName = "TitleId")]
@@ -51,18 +54,34 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
             get => TitleId.ToString();
             set => TitleId = new TitleID(value);
         }
+
         public bool PreLoad { get; set; } // always false? (except for 5 titles in injections.json)
-        public string Version
+
+        [JsonIgnore]
+        public int Version
         {
             get
             {
-                return (JsonType == DatabaseJsonType.Games || JsonType == DatabaseJsonType.Games3DS) ? "" : _version;
+                return (JsonType == DatabaseJsonType.Games || JsonType == DatabaseJsonType.Games3DS) ? -1 : _version;
+            }
+            set => _version = value;
+        }
+        [JsonProperty(PropertyName = "Version")]
+        public string VersionString
+        {
+            get
+            {
+                return Version < 0 ? "" : Version.ToString();
             }
             set
             {
-                _version = value;
+                if (int.TryParse(value, out int version))
+                {
+                    Version = version;
+                }
             }
         }
+
         public bool DiscOnly
         {
             get
@@ -142,7 +161,7 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
                         Size = ulong.Parse(child.Value);
                         break;
                     case "title_version":
-                        Version = child.Value;
+                        VersionString = child.Value;
                         break;
                 }
             }
@@ -164,7 +183,7 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
         {
             var hashCode = 893656227;
             hashCode = hashCode * -1521134295 + EqualityComparer<TitleID>.Default.GetHashCode(TitleId);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Version);
+            hashCode = hashCode * -1521134295 + Version.GetHashCode();
             return hashCode;
         }
 
