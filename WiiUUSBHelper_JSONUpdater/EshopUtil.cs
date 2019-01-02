@@ -40,6 +40,8 @@ namespace WiiUUSBHelper_JSONUpdater
         private readonly CertificateWebClient certWebClient;
         private readonly TitleDatabase titleDatabase;
 
+        public int newestWiiUUpdateListVersion { get; private set;  } = -1;
+
         public EshopUtil(TitleDatabase db, string sslKeyBagPath, string keyBagPassword) : this(db, new X509Certificate2(sslKeyBagPath, keyBagPassword)) { }
 
         public EshopUtil(TitleDatabase db, X509Certificate2 certificate)
@@ -217,6 +219,11 @@ namespace WiiUUSBHelper_JSONUpdater
         /// <returns>A list of update titles</returns>
         public async Task<List<EshopTitle>> GetAllWiiUUpdates(int currentListVersion = 1)
         {
+            if (currentListVersion < 1)
+            {
+                currentListVersion = 1;
+            }
+
             Console.Write("Getting latest update list version ...");
             int listVersion;
             int retryCount = 0;
@@ -237,6 +244,7 @@ namespace WiiUUSBHelper_JSONUpdater
                 }
             }
 
+            newestWiiUUpdateListVersion = listVersion;
             Console.WriteLine(" {0}.", listVersion);
 
             progressManager.Reset(listVersion-currentListVersion);
