@@ -82,7 +82,7 @@ namespace WiiUUSBHelper_JSONUpdater
             if (dlcs3DS) db.AddTitles(await eshopUtil.GetAllDLCsForTitles(db.GetTitleSet(DatabaseJsonType.Games3DS).Titles));
 
             db.WriteAllDatabaseFiles();
-            wiiuUpdateListVersion = eshopUtil.newestWiiUUpdateListVersion;
+            wiiuUpdateListVersion = eshopUtil.NewestWiiUUpdateListVersion;
 
             eshopUtil.Dispose();
         }

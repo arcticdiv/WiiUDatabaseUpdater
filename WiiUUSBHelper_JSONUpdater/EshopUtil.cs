@@ -38,7 +38,7 @@ namespace WiiUUSBHelper_JSONUpdater
         private readonly CertificateWebClient certWebClient;
         private readonly TitleDatabase titleDatabase;
 
-        public int newestWiiUUpdateListVersion { get; private set;  } = -1;
+        public int NewestWiiUUpdateListVersion { get; private set;  } = -1;
 
         public EshopUtil(TitleDatabase db, string sslKeyBagPath, string keyBagPassword) : this(db, new X509Certificate2(sslKeyBagPath, keyBagPassword)) { }
 
@@ -183,7 +183,7 @@ namespace WiiUUSBHelper_JSONUpdater
                 listVersion = await Tagaya.GetLatestListVersion(webClient);
             });
 
-            newestWiiUUpdateListVersion = listVersion;
+            NewestWiiUUpdateListVersion = listVersion;
             Console.WriteLine(" {0}.", listVersion);
 
             progressManager.Reset(listVersion-currentListVersion);
