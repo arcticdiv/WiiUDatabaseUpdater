@@ -15,8 +15,6 @@ namespace WiiUUSBHelper_JSONUpdater
     class EshopUtil : IDisposable
     {
         private const int TitleRequestLimit = 200;
-        private const int MaxRetries = 5;
-        private const int RetryWaitTime = 5000;
 
         private const string TMDUrl = "http://ccs.cdn.c.shop.nintendowifi.net/";
         private const string TMDGamePath = "ccs/download/{0}/tmd";
@@ -89,23 +87,9 @@ namespace WiiUUSBHelper_JSONUpdater
             {
                 if (region == Region.None || region == Region.ALL)
                     continue;
-                int retryCount = 0;
-                while (true) // retry loop
-                {
-                    try
-                    {
-                        titleCounts.Add(region, await Samurai.GetTitleCountForRegion(webClient, region, shopID));
-                        break;
-                    }
-                    catch (Exception e)
-                    {
-                        if (retryCount == MaxRetries) // throw if MaxRetries has been reached 
-                            throw;
-                        retryCount++;
-                        Console.WriteLine($"Retrying 'Samurai.GetTitleCountForRegion({region}, {shopID})' in {RetryWaitTime} ms. ({retryCount}/{MaxRetries})");
-                        System.Threading.Thread.Sleep(RetryWaitTime);
-                    }
-                }
+                await Retry(async () => {
+                    titleCounts.Add(region, await Samurai.GetTitleCountForRegion(webClient, region, shopID));
+                });
             }
 
             int totalTitleCount = titleCounts.Values.Sum();
@@ -117,7 +101,6 @@ namespace WiiUUSBHelper_JSONUpdater
             List<EshopTitle> titleList = new List<EshopTitle>();
 
             // loop through regions
-            int titleIndex = 1;
             foreach (KeyValuePair<Region, int> pair in titleCounts)
             {
                 Region region = pair.Key;
@@ -126,24 +109,11 @@ namespace WiiUUSBHelper_JSONUpdater
                 // get titles from samurai
                 for (int offset = 0; offset < titleCount; offset += TitleRequestLimit)
                 {
-                    XDocument titlesXml;
-                    int retryCount = 0;
-                    while (true) // retry loop
-                    {
-                        try
-                        {
-                            titlesXml = await Samurai.GetTitlesXmlForRegion(webClient, region, shopID, TitleRequestLimit, offset);
-                            break;
-                        }
-                        catch (Exception e)
-                        {
-                            if (retryCount == MaxRetries) // throw if MaxRetries has been reached 
-                                throw;
-                            retryCount++;
-                            Console.WriteLine($"Retrying 'Samurai.GetTitlesXmlForRegion({region}, {shopID}, {TitleRequestLimit}, {offset})' in {RetryWaitTime} ms. ({retryCount}/{MaxRetries})");
-                            System.Threading.Thread.Sleep(RetryWaitTime);
-                        }
-                    }
+                    XDocument titlesXml = null;
+                    await Retry(async () => {
+                        titlesXml = await Samurai.GetTitlesXmlForRegion(webClient, region, shopID, TitleRequestLimit, offset);
+                    });
+
                     /*  structure:
                      *  <eshop><contents ...>
                      *      <content index=1><title ...>[title info]</title></content>
@@ -161,9 +131,9 @@ namespace WiiUUSBHelper_JSONUpdater
                         {
                             DateTime releaseDate;
                             if (!DateTime.TryParseExact(releaseDateString, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out releaseDate))
-                                goto step;
+                                continue;
                             if (releaseDate > currentDate)
-                                goto step;
+                                continue;
                         }
 
                         // create title and add data
@@ -176,35 +146,18 @@ namespace WiiUUSBHelper_JSONUpdater
 
                         // some exceptions:
                         if (title.Platform == 63 || title.Platform == 1003) // ignore 3DS software updates
-                            goto step;
+                            continue;
                         if (title.Platform == 143) // ignore some unknown platform with just 1 title
-                            goto step;
+                            continue;
 
                         // get remaining data from ninja
                         XElement titleECInfoElement;
-                        retryCount = 0;
-                        while (true) // retry loop
-                        {
-                            try
-                            {
-                                titleECInfoElement = await Ninja.GetECInfoForRegionAndTitleID(certWebClient, region, title.EshopId);
-                                title.AddDataFromXml(titleECInfoElement);
-                                if (title.JsonType != DatabaseJsonType.None)
-                                    titleList.Add(title);
-                                break;
-                            }
-                            catch (Exception e)
-                            {
-                                if (retryCount == MaxRetries) // throw if MaxRetries has been reached 
-                                    throw;
-                                retryCount++;
-                                Console.WriteLine($"Retrying 'Ninja.GetECInfoForRegionAndTitleID({region}, {title.EshopId})' in {RetryWaitTime} ms. ({retryCount}/{MaxRetries})");
-                                System.Threading.Thread.Sleep(RetryWaitTime);
-                            }
-                        }
-
-                    step:
-                        titleIndex++;
+                        await Retry(async () => {
+                            titleECInfoElement = await Ninja.GetECInfoForRegionAndTitleID(certWebClient, region, title.EshopId);
+                            title.AddDataFromXml(titleECInfoElement);
+                            if (title.JsonType != DatabaseJsonType.None)
+                                titleList.Add(title);
+                        });
                     }
                 }
             }
@@ -225,24 +178,10 @@ namespace WiiUUSBHelper_JSONUpdater
             }
 
             Console.Write("Getting latest update list version ...");
-            int listVersion;
-            int retryCount = 0;
-            while (true) // retry loop
-            {
-                try
-                {
-                    listVersion = await Tagaya.GetLatestListVersion(webClient);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    if (retryCount == MaxRetries) // throw if MaxRetries has been reached 
-                        throw;
-                    retryCount++;
-                    Console.WriteLine($"Retrying 'Tagaya.GetLatestListVersion()' in {RetryWaitTime} ms. ({retryCount}/{MaxRetries})");
-                    System.Threading.Thread.Sleep(RetryWaitTime);
-                }
-            }
+            int listVersion = -1;
+            await Retry(async () => {
+                listVersion = await Tagaya.GetLatestListVersion(webClient);
+            });
 
             newestWiiUUpdateListVersion = listVersion;
             Console.WriteLine(" {0}.", listVersion);
@@ -264,36 +203,30 @@ namespace WiiUUSBHelper_JSONUpdater
                  *      ...
                  *  </titles></version_list>
                  */
-                retryCount = 0;
-                while (true) // retry loop
+
+                XDocument updatesXml = null;
+                bool success = await Retry(async () =>
                 {
-                    try
-                    {
-                        XDocument updatesXml = await Tagaya.GetUpdatesXmlForListVersion(webClient, i);
-                        XElement titlesElement = updatesXml.Root.Element("titles");
+                    updatesXml = await Tagaya.GetUpdatesXmlForListVersion(webClient, i);
+                },
+                shouldStopRetrying: (e) =>
+                {
+                    // for some list versions a 403 error is received, ignore
+                    return e is WebException we && we.Response is HttpWebResponse resp && resp.StatusCode == HttpStatusCode.Forbidden;
+                });
+                if (!success)
+                    continue;
 
-                        // iterate over update version in xml
-                        foreach (XElement updateElement in titlesElement.Elements())
-                        {
-                            EshopTitle update = new EshopTitle();
-                            update.TitleId = new TitleID(updateElement.Element("id").Value);
-                            update.VersionString = updateElement.Element("version").Value;
-                            update.JsonType = DatabaseJsonType.Updates;
+                // iterate over update version in xml
+                XElement titlesElement = updatesXml.Root.Element("titles");
+                foreach (XElement updateElement in titlesElement.Elements())
+                {
+                    EshopTitle update = new EshopTitle();
+                    update.TitleId = new TitleID(updateElement.Element("id").Value);
+                    update.VersionString = updateElement.Element("version").Value;
+                    update.JsonType = DatabaseJsonType.Updates;
 
-                            updateSet.Add(update);
-                        }
-                        break;
-                    }
-                    catch (Exception e)
-                    {
-                        if (e is WebException we && we.Response is HttpWebResponse resp && resp.StatusCode == HttpStatusCode.Forbidden) // for some list versions a 403 error is received, ignore
-                            break;
-                        else if (retryCount == MaxRetries) // throw if MaxRetries has been reached 
-                            throw;
-                        retryCount++;
-                        Console.WriteLine($"Retrying 'Tagaya.GetUpdatesXmlForListVersion({i})' in {RetryWaitTime} ms. ({retryCount}/{MaxRetries})");
-                        System.Threading.Thread.Sleep(RetryWaitTime);
-                    }
+                    updateSet.Add(update);
                 }
             }
 
@@ -312,24 +245,10 @@ namespace WiiUUSBHelper_JSONUpdater
             Console.WriteLine("Downloading 3DS update list ...");
             progressManager.SetTitle("Downloading 3DS update list ...");
 
-            byte[] versionListData;
-            int retryCount = 0;
-            while (true) // retry loop
-            {
-                try
-                {
-                    versionListData = await Tagaya3DS.GetVersionListData(webClient);
-                    break;
-                }
-                catch (Exception e)
-                {
-                    if (retryCount == MaxRetries) // throw if MaxRetries has been reached 
-                        throw;
-                    retryCount++;
-                    Console.WriteLine($"Retrying 'Tagaya3DS.GetVersionListData()' in {RetryWaitTime} ms. ({retryCount}/{MaxRetries})");
-                    System.Threading.Thread.Sleep(RetryWaitTime);
-                }
-            }
+            byte[] versionListData = null;
+            await Retry(async () => {
+                versionListData = await Tagaya3DS.GetVersionListData(webClient);
+            });
 
             // see: http://3dbrew.org/wiki/Home_Menu#VersionList
             // first byte should always be 1
@@ -376,7 +295,6 @@ namespace WiiUUSBHelper_JSONUpdater
 
             List<EshopTitle> dlcList = new List<EshopTitle>();
 
-            int index = 1;
             foreach (EshopTitle title in titles.Where(t => (t.JsonType == DatabaseJsonType.Games || t.JsonType == DatabaseJsonType.Games3DS) && t.IsNativeTitle))
             {
                 progressManager.Step("Downloading DLC info ...");
@@ -384,29 +302,16 @@ namespace WiiUUSBHelper_JSONUpdater
                 EshopTitle dlc = new EshopTitle();
                 dlc.TitleId = title.TitleId.DLCID;
 
-                int retryCount = 0;
-                while (true) // retry loop
+                await Retry(async () =>
                 {
-                    try
-                    {
-                        dlc.Size = await GetContentSizeForTitle(dlc);
-                        // if no exception is thrown, the title does have a DLC
-                        dlcList.Add(dlc);
-                        break;
-                    }
-                    catch (Exception e)
-                    {
-                        if (e is WebException we && we.Response is HttpWebResponse resp && resp.StatusCode == HttpStatusCode.NotFound) // 404 -> no DLC
-                            break;
-                        else if (retryCount == MaxRetries) // throw if MaxRetries has been reached 
-                            throw;
-                        retryCount++;
-                        Console.WriteLine($"Retrying 'GetContentSizeForTitle({dlc.TitleId})' in {RetryWaitTime} ms. ({retryCount}/{MaxRetries})");
-                        System.Threading.Thread.Sleep(RetryWaitTime);
-                    }
-                }
-
-                index++;
+                    dlc.Size = await GetContentSizeForTitle(dlc);
+                    dlcList.Add(dlc); // if no exception is thrown, the title does have a DLC
+                },
+                shouldStopRetrying: (e) =>
+                {
+                    // 404 -> no DLC
+                    return e is WebException we && we.Response is HttpWebResponse resp && resp.StatusCode == HttpStatusCode.NotFound;
+                });
             }
             return dlcList;
         }
@@ -423,32 +328,18 @@ namespace WiiUUSBHelper_JSONUpdater
             progressManager.SetTitle(string.Format("Getting title sizes for {0} titles ...", calcsRequired));
             progressManager.Reset(calcsRequired);
 
-            int index = 1;
             foreach (EshopTitle title in titles.Where(t => t.Size == 0))
             {
                 progressManager.Step(title.TitleId.ToString());
-                
-                int retryCount = 0;
-                while (true) // retry loop
-                {
-                    try
-                    {
-                        title.Size = await GetContentSizeForTitle(title);
-                        break;
-                    }
-                    catch (Exception e)
-                    {
-                        if (e is WebException we && we.Response is HttpWebResponse resp && resp.StatusCode == HttpStatusCode.NotFound)
-                            break;
-                        else if (retryCount == MaxRetries) // throw if MaxRetries has been reached 
-                            throw;
-                        retryCount++;
-                        Console.WriteLine($"Retrying 'GetContentSizeForTitle({title.TitleId})' in {RetryWaitTime} ms. ({retryCount}/{MaxRetries})");
-                        System.Threading.Thread.Sleep(RetryWaitTime);
-                    }
-                }
 
-                index++;
+                await Retry(async () =>
+                {
+                    title.Size = await GetContentSizeForTitle(title);
+                },
+                shouldStopRetrying: (e) =>
+                {
+                    return e is WebException we && we.Response is HttpWebResponse resp && resp.StatusCode == HttpStatusCode.NotFound;
+                });
             }
         }
 
@@ -494,6 +385,40 @@ namespace WiiUUSBHelper_JSONUpdater
             }
 
             return totalSize;
+        }
+
+        /// <summary>
+        /// Retries the specified action multiple times (until the action doesn't throw an exception), and waits inbetween tries.
+        /// </summary>
+        /// <param name="action">The action to execute until it succeeds</param>
+        /// <param name="retryWaitMs">The number of milliseconds inbetween tries</param>
+        /// <param name="retries">The number of times the action will be retried if unsuccessful</param>
+        /// <param name="writeToConsole">Specifies if each retry should be printed to the console</param>
+        /// <param name="shouldStopRetrying">A function deciding if further retries should occur (return true if the retries should stop immediately, or false if the action should be retried again)</param>
+        /// <returns>True if the action succeeded, or false if <paramref name="shouldStopRetrying"/> returned true after the action was unsuccessful</returns>
+        internal static async Task<bool> Retry(Func<Task> action, int retryWaitMs = 5000, int retries = 3, bool writeToConsole = true, Func<Exception, bool> shouldStopRetrying = null)
+        {
+            int retryCount = 0;
+            while (true)
+            {
+                try
+                {
+                    await action();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    if (shouldStopRetrying != null && shouldStopRetrying(e))
+                        return false;
+
+                    if (retryCount == retries)
+                        throw;
+                    if (writeToConsole)
+                        Console.WriteLine($"> Retrying in {retryWaitMs} ms. ({retryCount+1}/{retries})");
+                    retryCount++;
+                    await Task.Delay(retryWaitMs);
+                }
+            }
         }
 
 
