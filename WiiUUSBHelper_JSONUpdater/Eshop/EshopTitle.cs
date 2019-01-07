@@ -101,7 +101,7 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
         {
             get
             {
-                if (!didCacheJsonType)
+                if (!didCacheJsonType && TitleId != null)
                 {
                     _jsonType = TitleId.JsonType;
                     if (_jsonType != DatabaseJsonType.None)

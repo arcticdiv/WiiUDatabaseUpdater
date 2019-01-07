@@ -52,10 +52,10 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
                                 case "0000":
                                     _jsonType = DatabaseJsonType.Games3DS;
                                     break;
-                                case "000e":
+                                case "000E":
                                     _jsonType = DatabaseJsonType.Updates3DS;
                                     break;
-                                case "008c":
+                                case "008C":
                                     _jsonType = DatabaseJsonType.Dlcs3DS;
                                     break;
                                 case "8004":
@@ -76,10 +76,10 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
                                 case "0002":
                                     _jsonType = DatabaseJsonType.Updates;
                                     break;
-                                case "000c":
+                                case "000C":
                                     _jsonType = DatabaseJsonType.Dlcs;
                                     break;
-                                case "000e":
+                                case "000E":
                                     _jsonType = DatabaseJsonType.Updates;
                                     break;
                                 default:
@@ -146,12 +146,15 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
 
         public TitleID(string titleIDString)
         {
+            if (titleIDString.Length != 16)
+                throw new ArgumentException($"Title ID length must be 16 characters (received {titleIDString.Length} characters)");
+
             this.titleIDString = titleIDString.ToUpper();
             string pID = PlatformID, cID = CategoryID;
             if (   !(pID == "0001" && (cID == "0001" || cID == "0005")) // Wii titleIDs
                 && !(pID == "0004" && (cID == "0000" || cID == "0002" || cID == "000E" || cID == "008C" || cID == "8004")) // 3DS titleIDs
                 && !(pID == "0005" && (cID == "0000" || cID == "0002" || cID == "000C" || cID == "000E"))) // WiiU titleIDs
-                throw new ArgumentException(String.Format("'{0}' is not a title ID.", titleIDString));
+                throw new ArgumentException(String.Format("'{0}' is not a valid title ID.", titleIDString));
         }
 
         public override string ToString()

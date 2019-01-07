@@ -10,8 +10,6 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
 {
     class DatabaseJsonIO
     {
-        private const Formatting jsonFormattingOptions = Formatting.Indented;
-
         public static List<EshopTitle> ReadTitlesFromJsonFile(string filePath)
         {
             JArray titlesArray = JArray.Parse(File.ReadAllText(filePath));
@@ -56,10 +54,10 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
             Console.WriteLine("Wrote {0,5} titles to database file {1}", titleList.Count, filePath);
         }
 
-        private static string JsonArrayToString(JArray titles)
+        internal static string JsonArrayToString(JArray titles, Formatting formatting = Formatting.Indented)
         {
             JsonSerializer ser = new JsonSerializer();
-            ser.Formatting = jsonFormattingOptions;
+            ser.Formatting = formatting;
             ser.Converters.Add(new StringEscapeJsonConverter());
 
             using (StringWriter stringWriter = new StringWriter())
