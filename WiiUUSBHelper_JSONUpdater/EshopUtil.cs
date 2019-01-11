@@ -162,6 +162,22 @@ namespace WiiUUSBHelper_JSONUpdater
                 }
             }
 
+            // merge titles that occur in all regions into one title with the 'ALL' region
+            IEnumerable<EshopTitle> titleListEnumerable = titleList;
+            var allRegions = Enum.GetValues(typeof(Region)).OfType<Region>().Where(r => r != Region.None && r != Region.ALL);
+            var groups = titleListEnumerable.GroupBy(t => t.TitleId).Select(g => g.ToList()).ToList();
+            foreach (var group in groups)
+            {
+                var groupRegions = group.Select(t => t.Region);
+                if (allRegions.All(groupRegions.Contains))
+                {
+                    titleListEnumerable = titleListEnumerable.Except(group.Skip(1));
+                    group[0].Region = Region.ALL;
+                }
+            }
+
+            titleList = titleListEnumerable.ToList();
+
             return titleList;
         }
         

@@ -66,7 +66,7 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
         }
 
 
-        public void AddTitle(EshopTitle title, DatabaseJsonType jsonType = DatabaseJsonType.None)
+        public void AddTitle(EshopTitle title, DatabaseJsonType jsonType = DatabaseJsonType.None, bool overwrite = true)
         {
             if (jsonType != DatabaseJsonType.None)
             {
@@ -82,15 +82,17 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
                     return;
             }
 
+            if (overwrite)
+                titleSets[jsonType].Titles.Remove(title);
             titleSets[jsonType].Titles.Add(title);
             titleSets[jsonType].Modified = true;
         }
 
-        public void AddTitles(ICollection<EshopTitle> gameTitles, DatabaseJsonType jsonType = DatabaseJsonType.None)
+        public void AddTitles(ICollection<EshopTitle> gameTitles, DatabaseJsonType jsonType = DatabaseJsonType.None, bool overwrite = true)
         {
             foreach (EshopTitle title in gameTitles)
             {
-                AddTitle(title, jsonType);
+                AddTitle(title, jsonType, overwrite);
             }
         }
     }

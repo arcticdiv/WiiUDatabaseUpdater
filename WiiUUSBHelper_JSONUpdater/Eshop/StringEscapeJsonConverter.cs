@@ -41,6 +41,9 @@ namespace WiiUUSBHelper_JSONUpdater.Eshop
                     case '/':
                         sb.Append("\\/");
                         break;
+                    case '"':
+                        sb.Append("\\\"");
+                        break;
                     default:
                         if (c < 0x20 || c > 0x7e)
                             sb.Append(String.Format("\\u{0:x4}", (int)c));
