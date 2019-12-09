@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace WiiUUSBHelper_JSONUpdater.Eshop
+namespace WiiUDatabaseUpdater.Eshop
 {
     class EshopTitle : IEquatable<EshopTitle>, IComparable<EshopTitle>
     {

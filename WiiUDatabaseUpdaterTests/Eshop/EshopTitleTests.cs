@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using WiiUUSBHelper_JSONUpdater.Eshop;
+using WiiUDatabaseUpdater.Eshop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Xml.Linq;
 
-namespace WiiUUSBHelper_JSONUpdater.Eshop.Tests
+namespace WiiUDatabaseUpdater.Eshop.Tests
 {
     [TestClass]
     public class EshopTitleTests

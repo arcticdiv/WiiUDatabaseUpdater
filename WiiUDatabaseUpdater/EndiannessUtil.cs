@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace WiiUUSBHelper_JSONUpdater
+namespace WiiUDatabaseUpdater
 {
     public static class EndiannessUtil
     {

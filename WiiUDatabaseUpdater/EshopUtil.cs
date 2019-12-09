@@ -8,9 +8,9 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using WiiUUSBHelper_JSONUpdater.Eshop;
+using WiiUDatabaseUpdater.Eshop;
 
-namespace WiiUUSBHelper_JSONUpdater
+namespace WiiUDatabaseUpdater
 {
     class EshopUtil : IDisposable
     {

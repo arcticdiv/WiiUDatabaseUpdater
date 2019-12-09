@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{40E3494C-5BB9-441A-9266-6B2AD6B7A47D}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>WiiUUSBHelper_JSONUpdater</RootNamespace>
-    <AssemblyName>WiiUUSBHelper_JSONUpdater</AssemblyName>
+    <RootNamespace>WiiUDatabaseUpdater</RootNamespace>
+    <AssemblyName>WiiUDatabaseUpdater</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

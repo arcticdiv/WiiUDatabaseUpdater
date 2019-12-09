@@ -2,7 +2,7 @@
 using System;
 using System.Text;
 
-namespace WiiUUSBHelper_JSONUpdater.Eshop
+namespace WiiUDatabaseUpdater.Eshop
 {
     class StringEscapeJsonConverter : JsonConverter
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace WiiUUSBHelper_JSONUpdater.Eshop
+namespace WiiUDatabaseUpdater.Eshop
 {
     class TitleDatabase
     {

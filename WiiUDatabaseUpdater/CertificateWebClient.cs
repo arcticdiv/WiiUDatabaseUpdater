@@ -2,7 +2,7 @@
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
 
-namespace WiiUUSBHelper_JSONUpdater
+namespace WiiUDatabaseUpdater
 {
     [System.ComponentModel.DesignerCategory("Code")]
     class CertificateWebClient : WebClient

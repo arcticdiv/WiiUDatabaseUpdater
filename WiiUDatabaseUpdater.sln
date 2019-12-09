@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiiUUSBHelper_JSONUpdater", "WiiUUSBHelper_JSONUpdater\WiiUUSBHelper_JSONUpdater.csproj", "{40E3494C-5BB9-441A-9266-6B2AD6B7A47D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiiUDatabaseUpdater", "WiiUDatabaseUpdater\WiiUDatabaseUpdater.csproj", "{40E3494C-5BB9-441A-9266-6B2AD6B7A47D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiiUUSBHelper_JSONUpdaterTests", "WiiUUSBHelper_JSONUpdaterTests\WiiUUSBHelper_JSONUpdaterTests.csproj", "{E3EC987F-BB93-4C89-B919-2CD8C078C7CD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiiUDatabaseUpdaterTests", "WiiUDatabaseUpdaterTests\WiiUDatabaseUpdaterTests.csproj", "{E3EC987F-BB93-4C89-B919-2CD8C078C7CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

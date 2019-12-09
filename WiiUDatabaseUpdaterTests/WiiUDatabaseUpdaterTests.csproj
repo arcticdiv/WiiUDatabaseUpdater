@@ -7,8 +7,8 @@
     <ProjectGuid>{E3EC987F-BB93-4C89-B919-2CD8C078C7CD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WiiUUSBHelper_JSONUpdaterTests</RootNamespace>
-    <AssemblyName>WiiUUSBHelper_JSONUpdaterTests</AssemblyName>
+    <RootNamespace>WiiUDatabaseUpdaterTests</RootNamespace>
+    <AssemblyName>WiiUDatabaseUpdaterTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -67,9 +67,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WiiUUSBHelper_JSONUpdater\WiiUUSBHelper_JSONUpdater.csproj">
+    <ProjectReference Include="..\WiiUDatabaseUpdater\WiiUDatabaseUpdater.csproj">
       <Project>{40E3494C-5BB9-441A-9266-6B2AD6B7A47D}</Project>
-      <Name>WiiUUSBHelper_JSONUpdater</Name>
+      <Name>WiiUDatabaseUpdater</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

@@ -3,7 +3,7 @@ using Newtonsoft.Json.Converters;
 using System;
 using System.Runtime.Serialization;
 
-namespace WiiUUSBHelper_JSONUpdater.Eshop
+namespace WiiUDatabaseUpdater.Eshop
 {
     public enum Region
     {

@@ -1,12 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using WiiUUSBHelper_JSONUpdater.Eshop;
+using WiiUDatabaseUpdater.Eshop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WiiUUSBHelper_JSONUpdater.Eshop.Tests
+namespace WiiUDatabaseUpdater.Eshop.Tests
 {
     [TestClass]
     public class TitleIDTests

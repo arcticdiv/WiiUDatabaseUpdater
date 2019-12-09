@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace WiiUUSBHelper_JSONUpdater.Eshop
+namespace WiiUDatabaseUpdater.Eshop
 {
     class DatabaseJsonIO
     {

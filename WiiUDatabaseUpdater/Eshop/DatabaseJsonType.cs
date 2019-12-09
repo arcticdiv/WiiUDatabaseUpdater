@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace WiiUUSBHelper_JSONUpdater.Eshop
+namespace WiiUDatabaseUpdater.Eshop
 {
     public enum DatabaseJsonType
     {

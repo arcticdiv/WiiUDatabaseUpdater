@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WiiUUSBHelper_JSONUpdater.Eshop;
+using WiiUDatabaseUpdater.Eshop;
 
-namespace WiiUUSBHelper_JSONUpdater
+namespace WiiUDatabaseUpdater
 {
     class Program
     {
