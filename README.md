@@ -18,7 +18,7 @@ This tool updates the .json database files used by Wii U USB Helper.
 
 # Certificate
 1. Retrieve `ctr-common-1.crt` and `ctr-common-1.key`:
-   * a) From the README here: [PlaiCDN](https://github.com/Plailect/PlaiCDN).    
+   * a) From the README here: [PlaiCDN](https://web.archive.org/web/20200308113423/https://github.com/Plailect/PlaiCDN).    
     **OR**
    * b) Using [ccrypt](https://github.com/SciresM/ccrypt), which may need to be patched before it works correctly.
 2. Convert the `.crt` and `.key` files into a `.p12` file using OpenSSL (choose any password for `<YourPassword>`, but keep in mind that you will need it later on):    
